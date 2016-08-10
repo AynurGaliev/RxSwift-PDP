@@ -25,7 +25,8 @@ public class ServiceLocator {
     
     public static func setupDependencies() {
         ServiceLocator.registerService(NetworkService() as INetworkService)
-        ServiceLocator.registerService(FriendsService(sessionManager: sessionManager) as IFriendsService)
+        ServiceLocator.registerService(self.sessionManager)
+        ServiceLocator.registerService(FriendsService() as IFriendsService)
     }
     
     private static var sessionManager: AFHTTPSessionManager = {

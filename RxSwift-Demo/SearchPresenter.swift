@@ -20,57 +20,63 @@ class SearchPresenter: NSObject, ISearchPresenter {
     }
     
     private var friends: [Friend] = []
-    private var searchingFriends: [Friend] = []
     private var disposeBag: DisposeBag = DisposeBag()
     
     private var friendsService: IFriendsService = ServiceLocator.getService()!
     private var networkService: INetworkService = ServiceLocator.getService()!
-    private var view: ISearchView?
+    private var view: ISearchView!
+    private var currentQuery: String = ""
     
-    init(view: ISearchView?) {
+    init(view: ISearchView) {
         super.init()
         self.view = view
 
-        self.view?.searchTextObservable
-              .throttle(0.3, scheduler: MainScheduler.instance)
-              .distinctUntilChanged()
-              .filter { $0 != "" }
-              .flatMapLatest({ (query: String) -> Observable<[Friend]> in
-                 return self.friendsService.API_searchFriends(userId, query: query, count: Constants.pageSize, offset: 10)
-              })
-              .bindTo(self.view!.searchTableView.rx_itemsWithCellIdentifier("ResultCell")) { (row: Int, friend: Friend,  cell: UITableViewCell) in
-                cell.textLabel?.text = friend.fullName
-              }.addDisposableTo(self.disposeBag)
-    }
-    
-    private func loadFriends() {
-        
-        let observable = self.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: self.friends.count)
-    
-         observable
-        .observeOn(MainScheduler.asyncInstance)
-        .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: DispatchQueueSchedulerQOS.UserInteractive))
-        .subscribe(onNext: {[weak self] (receivedFriends: [Friend]) in
-                guard let sself = self else { return }
-
-                sself.view?.setLoadingState(!(receivedFriends.count < Constants.pageSize))
+        self.view
+          .searchTextObservable
+          .flatMap({ (value: (index: Int, query: String)) -> Observable<[Friend]> in
             
+                if self.currentQuery != value.query {
+                    self.friends = []
+                    self.view.reloadTableView()
+                }
+                self.currentQuery = value.query
+                var friendsObservable: Observable<[Friend]>
+
+                if value.index == self.friends.count - 1 || self.friends.count == 0 {
+                    if value.query == "" {
+                        friendsObservable = self.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: self.friends.count)
+                    } else {
+                        friendsObservable = self.friendsService.API_searchFriends(userId, query: value.query, count: Constants.pageSize, offset: self.friends.count)
+                    }
+                    return friendsObservable
+                } else {
+                    return Observable.never()
+                }
+          })
+          .observeOn(MainScheduler.asyncInstance)
+          .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: DispatchQueueSchedulerQOS.UserInteractive))
+          .subscribe(onNext: { [weak self] (receivedFriends) in
+            
+                guard let sself = self else { return }
+            
+                sself.view.setLoadingState(!(receivedFriends.count < Constants.pageSize))
+
                 guard receivedFriends.count > 0 else { return }
                 var indexPaths: [NSIndexPath] = []
                 for i in 0..<receivedFriends.count {
                     indexPaths.append(NSIndexPath(forRow: sself.friends.count + i, inSection: 0))
                 }
                 sself.friends.appendContentsOf(receivedFriends)
-                sself.view?.reloadIndexPaths(indexPaths, animation: UITableViewRowAnimation.Bottom)
-            }, onError: { (error: ErrorType) in
-                self.view?.setLoadingState(false)
-            }, onCompleted: {
-                
-        }) {
-            
-        }.addDisposableTo(self.disposeBag)
-        
-     
+                sself.view.reloadIndexPaths(indexPaths, animation: UITableViewRowAnimation.Bottom)
+
+           }, onError: { (error) in
+                self.view.setLoadingState(false)
+           }, onCompleted: {
+                    
+           }, onDisposed: {
+                    
+           })
+          .addDisposableTo(self.disposeBag)
     }
 }
 
@@ -94,11 +100,11 @@ extension SearchPresenter: TableViewProtocol {
         return cell
     }
     
-    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.row == self.friends.count - 1 {
-            self.loadFriends()
-        }
-    }
+//    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+//        if indexPath.row == self.friends.count - 1 {
+//            self.loadFriends()
+//        }
+//    }
     
 }
 

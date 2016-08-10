@@ -26,10 +26,6 @@ public class FriendsService: IFriendsService {
     
     private var sessionManager: AFHTTPSessionManager = ServiceLocator.getService()!
     
-    init(sessionManager: AFHTTPSessionManager) {
-        self.sessionManager = sessionManager
-    }
-    
     func API_fetchFriends(userId: Int, count: Int, offset: Int) -> Observable<[Friend]> {
         
         return Observable.create { (observer: AnyObserver<[Friend]>) -> Disposable in

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A41E3D621D5B849100A9FAFC /* VK_ios_sdk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41E3D611D5B849100A9FAFC /* VK_ios_sdk.framework */; };
 		A4653B821D537CA800154212 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4653B811D537CA800154212 /* AppDelegate.swift */; };
 		A4653B841D537CA800154212 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4653B831D537CA800154212 /* SearchViewController.swift */; };
 		A4653B891D537CA800154212 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4653B871D537CA800154212 /* Main.storyboard */; };
@@ -47,6 +48,7 @@
 
 /* Begin PBXFileReference section */
 		1C639873AB3BA99BA6A8D60D /* Pods_RxSwift_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxSwift_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A41E3D611D5B849100A9FAFC /* VK_ios_sdk.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VK_ios_sdk.framework; path = "Pods/../build/Debug-iphoneos/VK-ios-sdk/VK_ios_sdk.framework"; sourceTree = "<group>"; };
 		A4653B7E1D537CA800154212 /* RxSwift-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RxSwift-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4653B811D537CA800154212 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4653B831D537CA800154212 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A41E3D621D5B849100A9FAFC /* VK_ios_sdk.framework in Frameworks */,
 				A4ED4EF91D588B7200CA60FC /* AFNetworking.framework in Frameworks */,
 				A4653BB51D53800500154212 /* RxCocoa.framework in Frameworks */,
 				A4653BB61D53800500154212 /* RxSwift.framework in Frameworks */,
@@ -108,6 +111,7 @@
 		9010ED6C5A58F64EB4F87D98 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A41E3D611D5B849100A9FAFC /* VK_ios_sdk.framework */,
 				A4ED4EF81D588B7200CA60FC /* AFNetworking.framework */,
 				A4653BB31D53800500154212 /* RxCocoa.framework */,
 				A4653BB41D53800500154212 /* RxSwift.framework */,
@@ -574,9 +578,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Debug-iphoneos/AFNetworking",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/VK-ios-sdk",
 				);
 				INFOPLIST_FILE = "RxSwift-Demo/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.flatstack.RxSwift-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -593,9 +598,10 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Debug-iphoneos/AFNetworking",
+					"$(PROJECT_DIR)/build/Debug-iphoneos/VK-ios-sdk",
 				);
 				INFOPLIST_FILE = "RxSwift-Demo/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.flatstack.RxSwift-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -13,7 +13,7 @@ import RxCocoa
 protocol ISearchView {
     var searchTableView: UITableView { get }
     func setTotalFriendsCount(text: String)
-    var searchTextObservable       : Observable<String> { get }
+    var searchTextObservable       : Observable<(Int, String)> { get }
     func reloadTableView()
     func reloadIndexPaths(indexPaths: [NSIndexPath], animation: UITableViewRowAnimation)
     func setLoadingState(isLoading: Bool)
@@ -34,7 +34,7 @@ class SearchViewController: UIViewController {
     }()
     
     private lazy var presenter: ISearchPresenter = {[weak self] in
-        let presenter = SearchPresenter(view: self)
+        let presenter = SearchPresenter(view: self!)
         self?.tableView.setAdapter(presenter)
         return presenter
     }()
@@ -48,6 +48,12 @@ class SearchViewController: UIViewController {
         let _ = self.presenter
         self.tableView.registerNib(UINib(nibName: "LoadingFooterView", bundle: nil), forHeaderFooterViewReuseIdentifier: "LoadingFooterView")
         self.tableView.tableFooterView = self.loadingView
+        
+        self.tableView.rx_willDisplayCell
+            .subscribeNext { (value: (cell: UITableViewCell, indexPath: NSIndexPath)) in
+                print("\(value.indexPath)")
+            }
+            .addDisposableTo(self.disposeBag)
     }
 }
 
@@ -62,8 +68,11 @@ extension SearchViewController: ISearchView {
         self.totalCountLabel.text = text ?? ""
     }
     
-    var searchTextObservable: Observable<String> {
-        return self.searchBar.rx_text.asObservable()
+    var searchTextObservable: Observable<(Int, String)> {
+
+        return Observable.combineLatest(self.tableView.rx_willDisplayCell, self.searchBar.rx_text) { (willDisplayEvent: WillDisplayCellEvent, query: String) -> (index: Int, query: String) in
+            return (index: willDisplayEvent.indexPath.row, query: query)
+        }.startWith((-1, ""))
     }
     
     func reloadTableView() {

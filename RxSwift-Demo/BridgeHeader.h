@@ -10,6 +10,6 @@
 #define BridgeHeader_h
 
 @import AFNetworking;
-
+@import VK_ios_sdk;
 
 #endif /* BridgeHeader_h */
