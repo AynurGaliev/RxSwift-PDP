@@ -17,6 +17,7 @@ protocol ISearchView {
     func reloadTableView()
     func reloadIndexPaths(indexPaths: [NSIndexPath], animation: UITableViewRowAnimation)
     func setLoadingState(isLoading: Bool)
+    func setEmptyResult()
 }
 
 class SearchViewController: UIViewController {
@@ -26,10 +27,17 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var totalCountLabel: UILabel!
     private var disposeBag: DisposeBag = DisposeBag()
+    private var token: String = ""
     
     private lazy var loadingView: LoadingFooterView = { 
         let view = NSBundle.mainBundle().loadNibNamed("LoadingFooterView", owner: nil, options: nil).first! as! LoadingFooterView
         view.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.size.width, height: 44)
+        return view
+    }()
+    
+    private lazy var emptyResultView: EmptyResultView = {
+        let view = NSBundle.mainBundle().loadNibNamed("EmptyResultView", owner: nil, options: nil).first! as! EmptyResultView
+        view.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.size.width, height: self.tableView.frame.size.height)
         return view
     }()
     
@@ -43,17 +51,23 @@ class SearchViewController: UIViewController {
         self.tableView.tableFooterView?.frame.size.height = 44.0
     }
     
+    func prepareController(withToken token: String) {
+        self.token = token
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let _ = self.presenter
         self.tableView.registerNib(UINib(nibName: "LoadingFooterView", bundle: nil), forHeaderFooterViewReuseIdentifier: "LoadingFooterView")
         self.tableView.tableFooterView = self.loadingView
         
-        self.tableView.rx_willDisplayCell
-            .subscribeNext { (value: (cell: UITableViewCell, indexPath: NSIndexPath)) in
-                print("\(value.indexPath)")
-            }
-            .addDisposableTo(self.disposeBag)
+//        self.searchBar.rx_text.subscribeNext { (query: String) in
+//            print("Some")
+//        }.addDisposableTo(self.disposeBag)
+//        
+//        self.tableView.rx_willDisplayCell.subscribeNext { (value: (cell: UITableViewCell, indexPath: NSIndexPath)) in
+//            print(value.indexPath)
+//        }.addDisposableTo(self.disposeBag)
     }
 }
 
@@ -70,9 +84,24 @@ extension SearchViewController: ISearchView {
     
     var searchTextObservable: Observable<(Int, String)> {
 
-        return Observable.combineLatest(self.tableView.rx_willDisplayCell, self.searchBar.rx_text) { (willDisplayEvent: WillDisplayCellEvent, query: String) -> (index: Int, query: String) in
-            return (index: willDisplayEvent.indexPath.row, query: query)
-        }.startWith((-1, ""))
+        let willDisplayObservable = self.tableView
+                            .rx_willDisplayCell
+                            .debug("RxWillDisplay")
+                            .flatMap({ (value: WillDisplayCellEvent) -> Observable<Int> in
+                                return Observable.of(value.indexPath.row)
+                            })
+                            .shareReplayLatestWhileConnected()
+                            .startWith(0)
+        
+        let searchBarText = self.searchBar
+                            .rx_text
+                            .shareReplayLatestWhileConnected()
+                            .debug("RxText")
+        
+        return Observable.combineLatest(willDisplayObservable, searchBarText, resultSelector: { (index: Int, query: String) -> (index: Int, query: String) in
+            return (index: index, query: query)
+        })
+        .debug("Combine")
     }
     
     func reloadTableView() {
@@ -94,6 +123,12 @@ extension SearchViewController: ISearchView {
             } else {
                 self.tableView.tableFooterView = nil
             }
+        }
+    }
+    
+    func setEmptyResult() {
+        UIView.animateWithDuration(0.5) { 
+            self.tableView.tableFooterView = self.emptyResultView
         }
     }
 }

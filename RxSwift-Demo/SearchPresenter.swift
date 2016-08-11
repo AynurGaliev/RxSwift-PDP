@@ -26,35 +26,39 @@ class SearchPresenter: NSObject, ISearchPresenter {
     private var networkService: INetworkService = ServiceLocator.getService()!
     private var view: ISearchView!
     private var currentQuery: String = ""
+    private var friendsObservable: Observable<[Friend]> = Observable.never()
     
     init(view: ISearchView) {
         super.init()
         self.view = view
 
-        self.view
+        self.friendsObservable =
+           self.view
           .searchTextObservable
           .flatMap({ (value: (index: Int, query: String)) -> Observable<[Friend]> in
             
-                if self.currentQuery != value.query {
-                    self.friends = []
-                    self.view.reloadTableView()
-                }
-                self.currentQuery = value.query
-                var friendsObservable: Observable<[Friend]>
-
-                if value.index == self.friends.count - 1 || self.friends.count == 0 {
-                    if value.query == "" {
-                        friendsObservable = self.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: self.friends.count)
-                    } else {
-                        friendsObservable = self.friendsService.API_searchFriends(userId, query: value.query, count: Constants.pageSize, offset: self.friends.count)
+                    if self.currentQuery != value.query {
+                        self.friends = []
+                        self.view.reloadTableView()
                     }
-                    return friendsObservable
-                } else {
-                    return Observable.never()
-                }
-          })
+                    self.currentQuery = value.query
+                    var friendsObservable: Observable<[Friend]>
+
+                    if value.index == self.friends.count - 1 || self.friends.count == 0 {
+                        if value.query == "" {
+                            friendsObservable = self.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: self.friends.count)
+                        } else {
+                            friendsObservable = self.friendsService.API_searchFriends(userId, query: value.query, count: Constants.pageSize, offset: self.friends.count)
+                        }
+                        return friendsObservable
+                    } else {
+                        return Observable.never()
+                    }
+                })
+            
+         self.friendsObservable
           .observeOn(MainScheduler.asyncInstance)
-          .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: DispatchQueueSchedulerQOS.UserInteractive))
+          .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: .UserInteractive))
           .subscribe(onNext: { [weak self] (receivedFriends) in
             
                 guard let sself = self else { return }
@@ -72,15 +76,15 @@ class SearchPresenter: NSObject, ISearchPresenter {
            }, onError: { (error) in
                 self.view.setLoadingState(false)
            }, onCompleted: {
-                    
+                if self.friends.count == 0 {
+                    self.view.setEmptyResult()
+                }
            }, onDisposed: {
-                    
+                rx_debug("Disposed")
            })
           .addDisposableTo(self.disposeBag)
     }
 }
-
-
 
 extension SearchPresenter: TableViewProtocol {
     
@@ -94,42 +98,12 @@ extension SearchPresenter: TableViewProtocol {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("ResultCell", forIndexPath: indexPath)
-        
         let friend = self.friends[indexPath.row]
         cell.textLabel?.text = friend.fullName
         return cell
     }
-    
-//    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-//        if indexPath.row == self.friends.count - 1 {
-//            self.loadFriends()
-//        }
-//    }
-    
 }
 
-extension UISearchBar {
+class EmptyCell: UITableViewCell {
     
-    var rx_active: ControlProperty<Bool> {
-        
-        let observable = Observable.deferred { () -> Observable<Bool> in
-            return Observable.create({ (observer: AnyObserver<Bool>) -> Disposable in
-                
-                return AnonymousDisposable.init({ 
-                    rx_debug("Disposed")
-                })
-            })
-        }
-        
-        let binding: UIBindingObserver<UISearchBar, Bool> = UIBindingObserver(UIElement: self) { (searchBar, isActive) in
-            if isActive {
-                self.becomeFirstResponder()
-            } else {
-                self.resignFirstResponder()
-            }
-        }
-        
-        return ControlProperty(values: observable, valueSink: binding)
-        
-    }
 }

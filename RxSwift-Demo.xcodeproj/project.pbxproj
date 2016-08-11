@@ -21,6 +21,9 @@
 		A4653BB81D53837500154212 /* FriendsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4653BB71D53837500154212 /* FriendsService.swift */; };
 		A4653BBB1D539AEB00154212 /* LoadingFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4653BBA1D539AEB00154212 /* LoadingFooterView.swift */; };
 		A4653BBD1D539B0100154212 /* LoadingFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A4653BBC1D539B0100154212 /* LoadingFooterView.xib */; };
+		A4AD36D01D5CA76400AFF137 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4AD36CF1D5CA76400AFF137 /* LoginViewController.swift */; };
+		A4AD36D41D5CBBCF00AFF137 /* EmptyResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4AD36D31D5CBBCF00AFF137 /* EmptyResultView.swift */; };
+		A4AD36D61D5CBBDC00AFF137 /* EmptyResultView.xib in Resources */ = {isa = PBXBuildFile; fileRef = A4AD36D51D5CBBDC00AFF137 /* EmptyResultView.xib */; };
 		A4ED4EEF1D58822400CA60FC /* SearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ED4EEE1D58822400CA60FC /* SearchPresenter.swift */; };
 		A4ED4EF11D5883F100CA60FC /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ED4EF01D5883F100CA60FC /* Helpers.swift */; };
 		A4ED4EF31D5884CF00CA60FC /* ServiceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ED4EF21D5884CF00CA60FC /* ServiceLocator.swift */; };
@@ -68,6 +71,9 @@
 		A4653BB71D53837500154212 /* FriendsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendsService.swift; sourceTree = "<group>"; };
 		A4653BBA1D539AEB00154212 /* LoadingFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingFooterView.swift; sourceTree = "<group>"; };
 		A4653BBC1D539B0100154212 /* LoadingFooterView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoadingFooterView.xib; sourceTree = "<group>"; };
+		A4AD36CF1D5CA76400AFF137 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		A4AD36D31D5CBBCF00AFF137 /* EmptyResultView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyResultView.swift; sourceTree = "<group>"; };
+		A4AD36D51D5CBBDC00AFF137 /* EmptyResultView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EmptyResultView.xib; sourceTree = "<group>"; };
 		A4ED4EEE1D58822400CA60FC /* SearchPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchPresenter.swift; sourceTree = "<group>"; };
 		A4ED4EF01D5883F100CA60FC /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		A4ED4EF21D5884CF00CA60FC /* ServiceLocator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceLocator.swift; sourceTree = "<group>"; };
@@ -145,11 +151,11 @@
 		A4653B801D537CA800154212 /* RxSwift-Demo */ = {
 			isa = PBXGroup;
 			children = (
+				A4AD36D11D5CBBA800AFF137 /* Views */,
 				A4ED4EFD1D58AA8400CA60FC /* Models */,
 				A4ED4EFC1D58AA6F00CA60FC /* View Controllers */,
 				A4ED4EFA1D588BD200CA60FC /* Supporting Files */,
 				A4ED4EF51D5889F500CA60FC /* Services */,
-				A4653BB91D539AC800154212 /* LoadingFooterView */,
 				A4653B811D537CA800154212 /* AppDelegate.swift */,
 				A4653B871D537CA800154212 /* Main.storyboard */,
 				A4653B8A1D537CA800154212 /* Assets.xcassets */,
@@ -187,6 +193,24 @@
 			name = LoadingFooterView;
 			sourceTree = "<group>";
 		};
+		A4AD36D11D5CBBA800AFF137 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A4AD36D21D5CBBB200AFF137 /* EmptyResult */,
+				A4653BB91D539AC800154212 /* LoadingFooterView */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		A4AD36D21D5CBBB200AFF137 /* EmptyResult */ = {
+			isa = PBXGroup;
+			children = (
+				A4AD36D31D5CBBCF00AFF137 /* EmptyResultView.swift */,
+				A4AD36D51D5CBBDC00AFF137 /* EmptyResultView.xib */,
+			);
+			name = EmptyResult;
+			sourceTree = "<group>";
+		};
 		A4ED4EF51D5889F500CA60FC /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -209,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				A4ED4EFE1D58AA9300CA60FC /* Search friends */,
+				A4AD36CF1D5CA76400AFF137 /* LoginViewController.swift */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -348,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4653B8E1D537CA800154212 /* LaunchScreen.storyboard in Resources */,
+				A4AD36D61D5CBBDC00AFF137 /* EmptyResultView.xib in Resources */,
 				A4653B8B1D537CA800154212 /* Assets.xcassets in Resources */,
 				A4653BBD1D539B0100154212 /* LoadingFooterView.xib in Resources */,
 				A4653B891D537CA800154212 /* Main.storyboard in Resources */,
@@ -431,6 +457,8 @@
 				A4ED4EF31D5884CF00CA60FC /* ServiceLocator.swift in Sources */,
 				A4653B821D537CA800154212 /* AppDelegate.swift in Sources */,
 				A4653BBB1D539AEB00154212 /* LoadingFooterView.swift in Sources */,
+				A4AD36D41D5CBBCF00AFF137 /* EmptyResultView.swift in Sources */,
+				A4AD36D01D5CA76400AFF137 /* LoginViewController.swift in Sources */,
 				A4653BB81D53837500154212 /* FriendsService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

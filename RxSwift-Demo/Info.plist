@@ -71,5 +71,18 @@
 	</array>
 	<key>baseURL</key>
 	<string>https://api.vk.com/method</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>vk5253935</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>vk5253935</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
