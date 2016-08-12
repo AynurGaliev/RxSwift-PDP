@@ -10,17 +10,30 @@
             <rect key="frame" x="0.0" y="0.0" width="407" height="79"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sS0-Vp-cbT">
+                    <rect key="frame" x="183" y="24" width="41" height="33"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <state key="normal" title="Retry">
+                        <color key="titleColor" red="0.80392156859999997" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="retry:" destination="iN0-l3-epB" eventType="touchUpInside" id="9Iw-ws-Fj2"/>
+                    </connections>
+                </button>
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="62d-BP-mgB">
                     <rect key="frame" x="193" y="30" width="20" height="20"/>
                 </activityIndicatorView>
             </subviews>
             <constraints>
                 <constraint firstItem="62d-BP-mgB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="LUr-6s-d3H"/>
+                <constraint firstItem="sS0-Vp-cbT" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="RGd-SM-1D2"/>
+                <constraint firstItem="sS0-Vp-cbT" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="vmu-JW-7Kl"/>
                 <constraint firstItem="62d-BP-mgB" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="xKv-GG-ZNY"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="activityIndicatorView" destination="62d-BP-mgB" id="BDc-Wq-oeh"/>
+                <outlet property="retryButton" destination="sS0-Vp-cbT" id="zbv-Oo-zz3"/>
             </connections>
             <point key="canvasLocation" x="430.5" y="337.5"/>
         </view>

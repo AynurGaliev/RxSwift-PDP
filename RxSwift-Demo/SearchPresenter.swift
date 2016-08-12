@@ -11,6 +11,7 @@ import RxCocoa
 import RxSwift
 
 protocol ISearchPresenter {
+    func retry()
 }
 
 class SearchPresenter: NSObject, ISearchPresenter {
@@ -24,47 +25,57 @@ class SearchPresenter: NSObject, ISearchPresenter {
     
     private var friendsService: IFriendsService = ServiceLocator.getService()!
     private var networkService: INetworkService = ServiceLocator.getService()!
-    private var view: ISearchView!
+    private weak var view: ISearchView!
     private var currentQuery: String = ""
-    private var friendsObservable: Observable<[Friend]> = Observable.never()
     
-    init(view: ISearchView) {
-        super.init()
+    private var friendsObservable: Observable<[Friend]> = Observable.never() {
+        didSet { self.getFriends() }
+    }
+    
+    func setView(view: ISearchView) {
         self.view = view
-
-        self.friendsObservable =
-           self.view
-          .searchTextObservable
-          .flatMap({ (value: (index: Int, query: String)) -> Observable<[Friend]> in
+        self.subscribe()
+    }
+    
+    func subscribe() {
+        
+        self.view.searchTextObservable.subscribeNext { [weak self] (value: (index: Int, query: String)) in
             
-                    if self.currentQuery != value.query {
-                        self.friends = []
-                        self.view.reloadTableView()
-                    }
-                    self.currentQuery = value.query
-                    var friendsObservable: Observable<[Friend]>
-
-                    if value.index == self.friends.count - 1 || self.friends.count == 0 {
-                        if value.query == "" {
-                            friendsObservable = self.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: self.friends.count)
-                        } else {
-                            friendsObservable = self.friendsService.API_searchFriends(userId, query: value.query, count: Constants.pageSize, offset: self.friends.count)
-                        }
-                        return friendsObservable
-                    } else {
-                        return Observable.never()
-                    }
-                })
+            guard let sself = self else { return }
             
-         self.friendsObservable
-          .observeOn(MainScheduler.asyncInstance)
-          .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: .UserInteractive))
-          .subscribe(onNext: { [weak self] (receivedFriends) in
+            if sself.currentQuery != value.query {
+                sself.friends = []
+                sself.view.reloadTableView()
+            }
+            sself.currentQuery = value.query
             
+            if value.index == sself.friends.count - 1 || sself.friends.count == 0 {
+                sself.view.setFooterState(FooterState.Info(.Loading))
+                if value.query == "" {
+                    sself.friendsObservable = sself.friendsService.API_fetchFriends(userId, count: Constants.pageSize, offset: sself.friends.count)
+                } else {
+                    sself.friendsObservable = sself.friendsService.API_searchFriends(userId, query: value.query, count: Constants.pageSize, offset: sself.friends.count)
+                }
+            }
+            
+        }.addDisposableTo(self.disposeBag)
+    }
+    
+    func getFriends() {
+        
+        self.friendsObservable
+            .observeOn(MainScheduler.asyncInstance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(globalConcurrentQueueQOS: .UserInteractive))
+            .subscribe(onNext: { [weak self] (receivedFriends) in
+                
                 guard let sself = self else { return }
-            
-                sself.view.setLoadingState(!(receivedFriends.count < Constants.pageSize))
-
+                
+                if receivedFriends.count < Constants.pageSize {
+                    sself.view.setFooterState(FooterState.Hidden)
+                } else {
+                    sself.view.setFooterState(FooterState.Info(.Loading))
+                }
+                
                 guard receivedFriends.count > 0 else { return }
                 var indexPaths: [NSIndexPath] = []
                 for i in 0..<receivedFriends.count {
@@ -72,21 +83,26 @@ class SearchPresenter: NSObject, ISearchPresenter {
                 }
                 sself.friends.appendContentsOf(receivedFriends)
                 sself.view.reloadIndexPaths(indexPaths, animation: UITableViewRowAnimation.Bottom)
-
-           }, onError: { (error) in
-                self.view.setLoadingState(false)
-           }, onCompleted: {
-                if self.friends.count == 0 {
-                    self.view.setEmptyResult()
-                }
-           }, onDisposed: {
-                rx_debug("Disposed")
-           })
-          .addDisposableTo(self.disposeBag)
+                
+                }, onError: { (error) in
+                    self.view.setFooterState(FooterState.Info(.Error))
+                }, onCompleted: {
+                    if self.friends.count == 0 {
+                        self.view.setFooterState(FooterState.NoMatchingResult)
+                    }
+                }, onDisposed: {
+                    rx_debug("Disposed")
+            })
+            .addDisposableTo(self.disposeBag)
+    }
+    
+    func retry() {
+        self.view.setFooterState(FooterState.Info(.Loading))
+        self.getFriends()
     }
 }
 
-extension SearchPresenter: TableViewProtocol {
+extension SearchPresenter: UITableViewDataSource {
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
@@ -102,8 +118,4 @@ extension SearchPresenter: TableViewProtocol {
         cell.textLabel?.text = friend.fullName
         return cell
     }
-}
-
-class EmptyCell: UITableViewCell {
-    
 }

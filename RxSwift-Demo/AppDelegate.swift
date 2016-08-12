@@ -23,34 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         vkInstance.registerDelegate(self)
         vkInstance.uiDelegate = self
-        
-        let observable =
-            Observable.create { (observer: AnyObserver<Int>) -> Disposable in
-            observer.onNext(1)
-            observer.onCompleted()
-            
-            return AnonymousDisposable.init({ 
-                print("Disposed!")
-            })
-        }
-        
-        observable.subscribeNext { (value: Int) in
-            print(value)
-        }.addDisposableTo(self.disposeBag)
-        
-        
-        let subject = PublishSubject<Int>()
-        
-        subject.subscribeNext { (value) in
-            print(value)
-        }.addDisposableTo(self.disposeBag)
-        
-        subject.onNext(1)
-        
-        subject.onCompleted()
-        
-        subject.onNext(2)
-        
+    
         return true
     }
     
